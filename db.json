@@ -1,0 +1,196 @@
+{
+  "riders": [
+    {
+      "name": "aerts t.",
+      "value": 15
+    },
+    {
+      "name": "agostinacchio f.",
+      "value": 1
+    },
+    {
+      "name": "baers a.",
+      "value": 3
+    },
+    {
+      "name": "bellens j.",
+      "value": 5
+    },
+    {
+      "name": "bertolini g.",
+      "value": 1
+    },
+    {
+      "name": "bommenel n.",
+      "value": 1
+    },
+    {
+      "name": "boros m.",
+      "value": 4
+    },
+    {
+      "name": "brunner e.",
+      "value": 1
+    },
+    {
+      "name": "ceolin f.",
+      "value": 1
+    },
+    {
+      "name": "corsus y.",
+      "value": 14
+    },
+    {
+      "name": "debord r.",
+      "value": 3
+    },
+    {
+      "name": "del grosso t.",
+      "value": 24
+    },
+    {
+      "name": "dockx a.",
+      "value": 6
+    },
+    {
+      "name": "ferdinande a.",
+      "value": 4
+    },
+    {
+      "name": "fontana f.",
+      "value": 7
+    },
+    {
+      "name": "hendrikx m.",
+      "value": 10
+    },
+    {
+      "name": "horny c.",
+      "value": 4
+    },
+    {
+      "name": "iserbyt e.",
+      "value": 25
+    },
+    {
+      "name": "janssen w.",
+      "value": 3
+    },
+    {
+      "name": "kamp r.",
+      "value": 15
+    },
+    {
+      "name": "kuhn k.",
+      "value": 12
+    },
+    {
+      "name": "kuypers g.",
+      "value": 18
+    },
+    {
+      "name": "lejeune g.",
+      "value": 5
+    },
+    {
+      "name": "loockx l.",
+      "value": 6
+    },
+    {
+      "name": "mason c.",
+      "value": 16
+    },
+    {
+      "name": "meeussen w.",
+      "value": 19
+    },
+    {
+      "name": "mein t.",
+      "value": 4
+    },
+    {
+      "name": "michels j.",
+      "value": 15
+    },
+    {
+      "name": "nieuwenhuis j.",
+      "value": 23
+    },
+    {
+      "name": "nys t.",
+      "value": 31
+    },
+    {
+      "name": "orts f.",
+      "value": 14
+    },
+    {
+      "name": "pidcock t.",
+      "value": 33
+    },
+    {
+      "name": "ronhaar p.",
+      "value": 21
+    },
+    {
+      "name": "ruegg t.",
+      "value": 5
+    },
+    {
+      "name": "soete d.",
+      "value": 7
+    },
+    {
+      "name": "sweeck l.",
+      "value": 24
+    },
+    {
+      "name": "van aert w.",
+      "value": 36
+    },
+    {
+      "name": "van de putte v.",
+      "value": 7
+    },
+    {
+      "name": "van der haar l.",
+      "value": 22
+    },
+    {
+      "name": "van der poel m.",
+      "value": 42
+    },
+    {
+      "name": "vandebosch t.",
+      "value": 13
+    },
+    {
+      "name": "vandenberghe v.",
+      "value": 3
+    },
+    {
+      "name": "vandeputte n.",
+      "value": 23
+    },
+    {
+      "name": "vantourenhout m.",
+      "value": 27
+    },
+    {
+      "name": "vermeersch g.",
+      "value": 16
+    },
+    {
+      "name": "verstrynge e.",
+      "value": 17
+    },
+    {
+      "name": "wyseure j.",
+      "value": 17
+    }
+  ],
+  "users": [],
+  "nextDeadline": null,
+  "raceCount": 0,
+  "raceHistory": []
+}

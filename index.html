@@ -1,0 +1,2508 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FantaCX - Multi-Utente</title>
+    <style>
+        :root {
+            --bg-color: #000000;
+            --surface-color: #000000;
+            --surface-hover: #2d2d2d;
+            --primary: #74F548;
+            --primary-variant: #7A0461;
+            --secondary: #74F548;
+            --error: #a83b3b;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --border: #333333;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            padding-bottom: 75px;
+        }
+
+        header {
+            background-color: var(--surface-color);
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        header h1 {
+            font-size: 1.1rem;
+            color: var(--primary);
+        }
+
+        .sync-status {
+            font-size: 0.72rem;
+            padding: 3px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-top: 4px;
+            font-weight: bold;
+        }
+        .sync-ok { background: rgba(3, 218, 198, 0.2); color: var(--secondary); }
+        .sync-err { background: rgba(207, 102, 121, 0.2); color: var(--error); }
+        .sync-sync { background: rgba(187, 134, 252, 0.2); color: var(--primary); }
+
+        .deadline-banner {
+            background-color: #161616;
+            border-bottom: 1px solid var(--border);
+            padding: 6px 12px;
+            text-align: center;
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+        }
+
+        .deadline-banner.expired {
+            background-color: rgba(168, 59, 59, 0.2);
+            color: #ff8a8a;
+        }
+
+        .container {
+            padding: 15px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background-color: var(--surface-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border);
+        }
+
+        .card h2 {
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            color: var(--secondary);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 5px;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        select, input[type="text"], input[type="password"], input[type="number"], input[type="date"], input[type="datetime-local"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #2a2a2a;
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            border-radius: 6px;
+            font-size: 0.95rem;
+        }
+
+        select:disabled, input:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary);
+            color: #000;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:disabled {
+            background-color: #444;
+            color: #888;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background-color: #333;
+            color: #fff;
+        }
+
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--surface-color);
+            display: flex;
+            justify-content: space-around;
+            border-top: 1px solid var(--border);
+            z-index: 100;
+        }
+
+        .nav-item {
+            padding: 10px 1px;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.62rem;
+            text-decoration: none;
+            flex: 1;
+            cursor: pointer;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            margin-top: 8px;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            color: var(--text-secondary);
+        }
+
+        .starter-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 8px;
+            background: #202020;
+            padding: 10px 12px;
+            border-radius: 6px;
+            border: 1px solid #333;
+        }
+
+        .starter-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .starter-left input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary);
+        }
+
+        .starter-left label {
+            margin-bottom: 0;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .captain-pill {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: #2c2c2c;
+            border: 1px solid #444;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .captain-pill input[type="radio"] {
+            accent-color: #ffd700;
+        }
+
+        .captain-pill.active-cap {
+            border-color: #ffd700;
+            color: #ffd700;
+            font-weight: bold;
+            background: rgba(255, 215, 0, 0.12);
+        }
+
+        .alert {
+            padding: 10px;
+            background-color: rgba(207, 102, 121, 0.2);
+            border: 1px solid var(--error);
+            color: #ff9a9a;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+        }
+
+        .info-box {
+            padding: 10px;
+            background-color: rgba(116, 245, 72, 0.1);
+            border: 1px solid var(--primary);
+            color: var(--text-primary);
+            border-radius: 6px;
+            font-size: 0.82rem;
+            margin-bottom: 12px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: 0.72rem;
+            font-weight: bold;
+        }
+        .status-ok { background: rgba(3, 218, 198, 0.2); color: var(--secondary); }
+        .status-cap { background: rgba(255, 215, 0, 0.2); color: #ffd700; border: 1px solid rgba(255, 215, 0, 0.5); }
+        .status-no { background: rgba(207, 102, 121, 0.2); color: var(--error); }
+        .val-plus { color: var(--secondary); font-weight: bold; }
+        .val-minus { color: var(--error); font-weight: bold; }
+
+        .preview-box {
+            background-color: #242424;
+            border: 2px solid var(--secondary);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .list-numbered {
+            font-size: 0.85rem;
+            padding-left: 0;
+            list-style: none;
+        }
+        .list-numbered li {
+            padding: 2px 0;
+            border-bottom: 1px dashed #333;
+        }
+
+        /* LOGIN & REGISTER OVERLAY */
+        #auth-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-color);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .login-card {
+            background-color: #111111;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 25px 20px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-card h1 {
+            color: var(--primary);
+            margin-bottom: 6px;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+
+        .login-card p.subtitle {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .remember-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+            margin-bottom: 12px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .remember-row input {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--primary);
+        }
+
+        .auth-switch-link {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .auth-switch-link span {
+            color: var(--primary);
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .team-fixed-box {
+            width: 100%;
+            padding: 10px 12px;
+            background-color: #2a2a2a;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .user-pill {
+            font-size: 0.72rem;
+            background: #2a2a2a;
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 4px 10px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .user-roster-card {
+            background: #161616;
+            border: 1px solid #2c2c2c;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+
+        .user-roster-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #2c2c2c;
+        }
+    </style>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="FantaCX">
+</head>
+<body>
+
+    <!-- SCHERMATA DETTAGLIO CORRIDORE -->
+    <div id="rider-detail-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.92); z-index:9000; overflow-y:auto; padding:15px;">
+        <div class="card" style="max-width:600px; margin:10px auto; border:1px solid var(--primary); background-color:#141414;">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:10px; margin-bottom:12px;">
+                <h2 id="rider-detail-title" style="margin:0; border:none; padding:0; text-transform:capitalize; font-size:1.25rem;">Dettaglio Corridore</h2>
+                <button type="button" onclick="closeRiderDetail()" style="width:auto; margin:0; padding:6px 14px; background:#333; color:#fff; font-size:0.85rem;">Chiudi ✕</button>
+            </div>
+            <div id="rider-detail-summary" style="margin-bottom:15px;"></div>
+            <h3 style="font-size:0.95rem; color:var(--secondary); margin-bottom:8px;">Storico Risultati Gare</h3>
+            <div id="rider-detail-history"></div>
+        </div>
+    </div>
+
+    <!-- SCHERMATA DI LOGIN / REGISTRAZIONE -->
+    <div id="auth-screen">
+        <!-- BOX LOGIN -->
+        <div id="login-box" class="login-card">
+            <h1>FCX 2026/2027</h1>
+            <p class="subtitle">Accedi con le tue credenziali</p>
+            <div id="auth-sync-msg" style="text-align:center; font-size:0.75rem; color:var(--text-secondary); margin-bottom:12px;">Connessione al database...</div>
+
+            <div class="form-group">
+                <label>Nome Utente / Team</label>
+                <input type="text" id="login-username" placeholder="Inserisci il tuo nome utente" autocomplete="username">
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="login-password" placeholder="Inserisci password" autocomplete="current-password">
+            </div>
+
+            <div class="remember-row">
+                <input type="checkbox" id="login-remember" checked>
+                <label for="login-remember" style="margin:0; cursor:pointer; color:var(--text-primary);">Ricordami su questo dispositivo</label>
+            </div>
+
+            <button type="button" id="btn-do-login" onclick="handleLogin()">Accedi</button>
+
+            <div class="auth-switch-link">
+                Non hai ancora un profilo? <span onclick="toggleAuthMode('register')">Registrati ora</span>
+            </div>
+        </div>
+
+        <!-- BOX REGISTRAZIONE -->
+        <div id="register-box" class="login-card" style="display:none;">
+            <h1>Crea Profilo FCX</h1>
+            <p class="subtitle">Registrati e componi subito la tua squadra (170 Cr)</p>
+
+            <div class="form-group">
+                <label>Scegli Nome Utente / Team</label>
+                <input type="text" id="reg-username" placeholder="es. MARCO">
+            </div>
+
+            <div class="form-group">
+                <label>Scegli Password</label>
+                <input type="password" id="reg-password" placeholder="Minimo 4 caratteri">
+            </div>
+
+            <div class="form-group">
+                <label>Conferma Password</label>
+                <input type="password" id="reg-password-confirm" placeholder="Ripeti password">
+            </div>
+
+            <div class="remember-row">
+                <input type="checkbox" id="reg-remember" checked>
+                <label for="reg-remember" style="margin:0; cursor:pointer; color:var(--text-primary);">Resta connesso dopo la registrazione</label>
+            </div>
+
+            <button type="button" onclick="handleRegister()">Crea Profilo ed Entra</button>
+
+            <div class="auth-switch-link">
+                Hai già un account? <span onclick="toggleAuthMode('login')">Torna al Login</span>
+            </div>
+        </div>
+    </div>
+
+    <header>
+        <div class="header-top">
+            <div style="width: 75px; text-align:left;">
+                <span id="role-badge" style="font-size:0.65rem; padding:2px 6px; border-radius:4px; background:#222; color:var(--text-secondary);">UTENTE</span>
+            </div>
+            <div>
+                <h1>FCX 2026/2027</h1>
+                <div id="sync-indicator" class="sync-status sync-sync">Connessione al Cloud...</div>
+            </div>
+            <div class="user-pill" onclick="logoutUser()" title="Esci">
+                <span id="current-user-label">--</span> ⎋
+            </div>
+        </div>
+    </header>
+    <div id="global-deadline-banner" class="deadline-banner">Nessuna scadenza attiva impostata</div>
+
+    <div class="container">
+
+        <!-- TAB HOME: CLASSIFICA GENERALE & ROSE -->
+        <div id="tab-home" class="tab-content active">
+            <div class="card">
+                <h2>Classifica Generale</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:36px;">#</th>
+                            <th>Partecipante</th>
+                            <th>Punti</th>
+                            <th>Budget</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tb-classifica"></tbody>
+                </table>
+            </div>
+
+            <div class="card" id="my-roster-card">
+                <h2 id="title-my-roster">La Mia Rosa</h2>
+                <div id="info-my-roster"></div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Corridore</th>
+                            <th style="text-align:right;">Valore</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tb-my-roster"></tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <h2>Rose Altri Partecipanti</h2>
+                <p style="font-size:0.78rem; color:var(--text-secondary); margin-bottom:10px;">Tocca il nome di un partecipante per espandere o chiudere la sua rosa.</p>
+                <div id="all-rosters-container"></div>
+            </div>
+        </div>
+
+        <!-- TAB FORMAZIONE (CON CAPITANO) -->
+        <div id="tab-formazione" class="tab-content">
+            <div class="card">
+                <h2>Schiera Formazione & Capitano</h2>
+                <div id="lineup-deadline-alert"></div>
+                <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:12px;">
+                    Seleziona esattamente <b>5 titolari</b> dalla tua rosa e designa <b>1 Capitano (C)</b> che otterrà punteggio <b>x2</b>.
+                </p>
+
+                <div class="form-group">
+                    <label>TEAM</label>
+                    <div id="lineup-team-display" class="team-fixed-box">--</div>
+                </div>
+
+                <div id="lineup-status-msg"></div>
+
+                <div id="lineup-form-container">
+                    <h3 style="margin-top:10px; color:var(--primary); font-size:0.95rem;">I tuoi 5 Titolari & Capitano (x2)</h3>
+                    <div id="starters-checkboxes" style="margin-top:8px;"></div>
+
+                    <button id="btn-save-lineup" onclick="saveLineup()" style="margin-top:15px;">Conferma Formazione e Capitano</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB GARA (SOLO ADMIN) -->
+        <div id="tab-gara" class="tab-content">
+            <!-- BOX TIMER SCADENZA FORMAZIONI E SCAMBI -->
+            <div class="card" style="border-color:var(--primary); background:#121212;">
+                <h2 style="color:var(--primary);">⏱️ Timer Scadenza Formazioni & Mercato</h2>
+                <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:10px;">
+                    Imposta data e ora limite entro cui gli utenti possono schierare la formazione, scegliere il capitano ed effettuare scambi.
+                </p>
+                <div class="form-group">
+                    <label>Data e Ora Scadenza Prossima Gara</label>
+                    <input type="datetime-local" id="admin-deadline-input">
+                </div>
+                <div style="display:flex; gap:8px;">
+                    <button type="button" onclick="saveRaceDeadline()" style="margin-top:4px;">Salva Scadenza</button>
+                    <button type="button" class="btn-secondary" onclick="clearRaceDeadline()" style="margin-top:4px;">Rimuovi Limite</button>
+                </div>
+            </div>
+
+            <!-- BOX INSERIMENTO RISULTATI GARA -->
+            <div class="card">
+                <h2>Inserisci Risultati Gara</h2>
+                <div id="admin-users-summary" style="margin-bottom:12px;"></div>
+
+                <div id="race-form-container">
+                    <div class="form-group">
+                        <label>Tipologia / Circuito Gara</label>
+                        <select id="race-type">
+                            <option value="Mondiale">Mondiale</option>
+                            <option value="Europeo">Europeo</option>
+                            <option value="Coppa del Mondo">Coppa del Mondo</option>
+                            <option value="Superprestige">Superprestige</option>
+                            <option value="X2O">X2O Trofee</option>
+                            <option value="HG Cross">HG Cross (ex Exact)</option>
+                            <option value="Camp. Nazionali">Campionati Nazionali</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Denominazione Gara (es. Niel, Overijse, Gavere...)</label>
+                        <input type="text" id="race-name" placeholder="-">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Data Gara</label>
+                        <input type="date" id="race-date">
+                    </div>
+
+                    <hr style="margin:15px 0; border-color:var(--border);">
+
+                    <h3>Top 10 Arrivo</h3>
+                    <div id="top10-inputs"></div>
+
+                    <h3 style="margin-top:15px;">Ritirati (DNF)</h3>
+                    <div id="dnf-inputs"></div>
+                    <button type="button" style="background:#333; color:#fff; margin-bottom:15px;" onclick="addDnfField()">+ Aggiungi DNF</button>
+
+                    <button id="btn-show-preview" onclick="generateRacePreview()">Genera Anteprima Risultati</button>
+                </div>
+
+                <!-- CONTENITORE ANTEPRIMA -->
+                <div id="race-preview-container" style="display:none;" class="preview-box">
+                    <h2 style="color:var(--secondary);">Anteprima Risultati Gara</h2>
+                    <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:10px;">
+                        Verifica punteggi (incluso Capitano x2 e formazioni ereditate) prima di pubblicare.
+                    </p>
+                    <div id="preview-content"></div>
+                    <button id="btn-confirm-race" style="background:var(--secondary); color:#000;" onclick="confirmAndSaveRace()">Conferma e Registra Gara</button>
+                    <button class="btn-secondary" onclick="cancelPreview()">Torna alla Modifica</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB STORICO GARE / VARIAZIONI -->
+        <div id="tab-historico" class="tab-content">
+            <div class="card">
+                <h2>Storico Gare e Variazioni</h2>
+                <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:12px;">
+                    Ordine d'arrivo Top 10, DNF, punteggi dei partecipanti (con Capitano x2) e variazioni listino.
+                </p>
+                <div id="history-container"></div>
+            </div>
+        </div>
+
+        <!-- TAB MERCATO / CREAZIONE ROSA INIZIALE -->
+        <div id="tab-mercato" class="tab-content">
+            <!-- SEZIONE CREAZIONE ROSA INIZIALE (PER NUOVI UTENTI PRIMA DELLA LORO PRIMA GARA) -->
+            <div id="initial-roster-builder-card" class="card" style="display:none; border-color:var(--primary);">
+                <h2>Componi la Tua Rosa Iniziale (7 Corridori)</h2>
+                <div class="info-box">
+                    <b>Benvenuto!</b> Prima della scadenza della tua prima gara hai <b>170 crediti</b> e puoi selezionare o sostituire liberamente i tuoi 7 corridori. Dopo la prima gara potrai fare al massimo 1 cambio a gara.
+                </div>
+
+                <div id="init-builder-budget" style="font-size:0.95rem; font-weight:bold; margin-bottom:12px; padding:8px; background:#1c1c1c; border-radius:6px;">
+                    Budget Speso: 0 / 170 Cr
+                </div>
+
+                <div id="init-builder-selects"></div>
+
+                <button type="button" id="btn-save-new-roster" onclick="saveNewUserInitialRoster()">Salva Rosa Iniziale</button>
+            </div>
+
+            <!-- SEZIONE SCAMBI STANDARD -->
+            <div id="standard-market-card" class="card">
+                <h2>Modulo Scambi</h2>
+                <div id="market-deadline-alert"></div>
+                <p id="market-rule-desc" style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:12px;">
+                    È consentito al massimo 1 scambio per partecipante ad ogni gara.
+                </p>
+
+                <div class="form-group">
+                    <label>TEAM</label>
+                    <div id="market-team-display" class="team-fixed-box">--</div>
+                </div>
+
+                <div id="market-status-msg"></div>
+
+                <div id="market-form-container">
+                    <div class="form-group">
+                        <label>Corridore da Cedere (dalla rosa)</label>
+                        <select id="market-out" onchange="onMarketOutChange()">
+                            <option value="">-- Seleziona --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Corridore da Acquistare (dal listino)</label>
+                        <select id="market-in" onchange="updateMarketCalculations()">
+                            <option value="">-- Seleziona prima il corridore da cedere --</option>
+                        </select>
+                    </div>
+
+                    <div id="market-calc" class="card" style="background:#2a2a2a; margin-top:10px;"></div>
+
+                    <button id="btn-execute-trade" onclick="executeTrade()" disabled>Conferma Scambio</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB LISTINO -->
+        <div id="tab-listino" class="tab-content">
+            <!-- BOX AGGIUNGI CORRIDORE (VISIBILE SOLO ALL'ADMIN) -->
+            <div id="card-add-rider" class="card" style="display:none; background:#1a1a1a; border-color:var(--primary);">
+                <h2 style="color:var(--primary);">+ Aggiungi Nuovo Corridore (Solo Admin)</h2>
+                <div class="form-group">
+                    <label>Nome Corridore (es. cognome n.)</label>
+                    <input type="text" id="new-rider-name" placeholder="es. sweeny h.">
+                </div>
+                <div class="form-group">
+                    <label>Valore Iniziale (Crediti)</label>
+                    <input type="number" id="new-rider-val" value="1" min="1">
+                </div>
+                <button type="button" style="background:var(--secondary); color:#000;" onclick="addNewRider()">Aggiungi al Listino</button>
+            </div>
+
+            <div class="card">
+                <h2>Listino Corridori e Valori</h2>
+                <p style="font-size:0.78rem; color:var(--text-secondary); margin-bottom:8px;">Clicca sulle intestazioni per ordinare o sul nome per lo storico.</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th onclick="setListinoSort('name')" style="cursor:pointer;">Corridore ↑↓</th>
+                            <th onclick="setListinoSort('value')" style="cursor:pointer;">Valore ↑↓</th>
+                            <th onclick="setListinoSort('points')" style="cursor:pointer;">Punti ↑↓</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tb-listino"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TAB RANKING -->
+        <div id="tab-ranking" class="tab-content">
+            <div class="card">
+                <h2>Ranking Generale</h2>
+                <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:12px;">
+                    Classifica indipendente: punti iniziali + punti gara (10 pt al 1°, 9 al 2°, ..., 1 al 10°).
+                </p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:40px;">#</th>
+                            <th>Corridore</th>
+                            <th style="text-align:right;">Punti</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tb-ranking"></tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- NAVBAR IN BASSO (6 SCHEDE PER UTENTI, 7 CON GARA PER ADMIN) -->
+    <div class="nav-bar">
+        <div class="nav-item active" id="nav-home" onclick="switchTab('home')">Home</div>
+        <div class="nav-item" id="nav-formazione" onclick="switchTab('formazione')">Formazione</div>
+        <div class="nav-item" id="nav-gara" style="display:none;" onclick="switchTab('gara')">Gara</div>
+        <div class="nav-item" id="nav-historico" onclick="switchTab('historico')">Storico</div>
+        <div class="nav-item" id="nav-mercato" onclick="switchTab('mercato')">Mercato</div>
+        <div class="nav-item" id="nav-listino" onclick="switchTab('listino')">Listino</div>
+        <div class="nav-item" id="nav-ranking" onclick="switchTab('ranking')">Ranking</div>
+    </div>
+
+    <script>
+        // ==========================================
+        // CONFIGURAZIONE GITHUB & PASSWORD ADMIN
+        // ==========================================
+        const GITHUB_USER = "raffaelezaini-FCX"; 
+        const GITHUB_REPO = "FCX_extended_multiuser";      
+        const GITHUB_PATH = "db.json";            
+        const TOKEN_PART_1 = "ghp_O7AINQl0BsfWEOq2"; 
+        const TOKEN_PART_2 = "RXo0leKr6sTOAM2NmgCz";
+        const GITHUB_TOKEN = TOKEN_PART_1 + TOKEN_PART_2;
+
+        // Password Master per accedere come Amministratore (puoi modificarla qui)
+        const ADMIN_PASSWORD = "admin2026";
+        const STORAGE_AUTH_KEY = "fcx_saved_session_v1";
+
+        const pointsTable = {
+            "Mondiale": [53, 39, 31, 25, 20, 16, 13, 10, 8, 6],
+            "Europeo": [43, 32, 25, 20, 16, 13, 11, 8, 6, 5],
+            "Coppa del Mondo": [37, 27, 21, 16, 13, 10, 8, 6, 4, 3],
+            "Superprestige": [27, 19, 15, 12, 10, 8, 7, 5, 4, 3],
+            "X2O": [27, 19, 15, 12, 10, 8, 7, 5, 4, 3],
+            "HG Cross": [21, 15, 12, 9, 7, 6, 5, 4, 3, 2],
+            "Camp. Nazionali": [5, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        };
+
+        const priceTable = {
+            "Mondiale": [3, 2, 2, 1, 1, 1, 1, 1, 1, 1],
+            "Europeo": [3, 2, 1, 1, 1, 1, 1, 1, 1, 0],
+            "Coppa del Mondo": [2, 2, 1, 1, 1, 1, 1, 1, 0, 0],
+            "Superprestige": [2, 2, 1, 1, 1, 1, 1, 0, 0, 0],
+            "X2O": [2, 2, 1, 1, 1, 1, 1, 0, 0, 0],
+            "HG Cross": [2, 2, 1, 1, 1, 0, 0, 0, 0, 0],
+            "Camp. Nazionali": [1, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        };
+
+        const rankingInitialPoints = {
+            "vantourenhout m.": 20,
+            "vandeputte n.": 14,
+            "kuypers g.": 13,
+            "meeussen w.": 12,
+            "michels j.": 9,
+            "corsus y.": 9,
+            "kamp r.": 8,
+            "mason c.": 8,
+            "wyseure j.": 8,
+            "van de putte v.": 3,
+            "lejeune g.": 3,
+            "orts f.": 2,
+            "vandebosch t.": 1
+        };
+
+        const rankingRacePoints = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1];
+
+        // Stato globale scalabile a N utenti
+        let state = {
+            riders: [],
+            users: [], // Array di oggetti utente: { id, name, password, score, budget, initialBudget, roster, starters, captain, prevStarters, prevCaptain, tradeDone, racesPlayed, tradeReplacements }
+            nextDeadline: null, // Stringa ISO datetime-local (es. "2026-11-29T14:30")
+            raceCount: 0,
+            raceHistory: []
+        };
+
+        let fileSha = null; 
+        let currentPendingRace = null;
+        let currentUserId = null;
+        let isAdmin = false;
+        let deadlineInterval = null;
+
+        // ==========================================
+        // INIZIALIZZAZIONE & MIGRAZIONE DATI
+        // ==========================================
+        async function initApp() {
+            setSyncStatus("Caricamento da GitHub...", "sync-sync");
+            await loadStateFromGitHub();
+            document.getElementById('auth-sync-msg').innerText = "Connesso al Cloud ✓";
+            document.getElementById('auth-sync-msg').style.color = "var(--secondary)";
+
+            startDeadlineWatcher();
+
+            // Controlla se c'è una sessione salvata in localStorage
+            const savedSessionRaw = localStorage.getItem(STORAGE_AUTH_KEY);
+            if (savedSessionRaw) {
+                try {
+                    const saved = JSON.parse(savedSessionRaw);
+                    if (saved && saved.username && saved.password) {
+                        const success = attemptAuthenticate(saved.username, saved.password, false);
+                        if (success) return;
+                    }
+                } catch (e) {
+                    localStorage.removeItem(STORAGE_AUTH_KEY);
+                }
+            }
+
+            // Altrimenti mostra schermata login
+            document.getElementById('auth-screen').style.display = 'flex';
+        }
+
+        // Converte automaticamente un eventuale vecchio db.json (con p1 e p2) nel nuovo formato scalabile state.users[]
+        function normalizeStateSchema(rawState) {
+            if (!rawState.raceHistory) rawState.raceHistory = [];
+            if (typeof rawState.nextDeadline === 'undefined') rawState.nextDeadline = null;
+
+            if (!Array.isArray(rawState.users)) {
+                rawState.users = [];
+                if (rawState.p1) {
+                    rawState.users.push({
+                        id: "u_1",
+                        name: rawState.p1.name || "BOGI",
+                        password: rawState.p1.password || "bogi123",
+                        score: rawState.p1.score || 0,
+                        budget: typeof rawState.p1.budget === 'number' ? rawState.p1.budget : 170,
+                        initialBudget: rawState.p1.initialBudget || 170,
+                        roster: rawState.p1.roster || [],
+                        starters: rawState.p1.starters || [],
+                        captain: rawState.p1.captain || "",
+                        prevStarters: rawState.p1.prevStarters || [...(rawState.p1.starters || [])],
+                        prevCaptain: rawState.p1.prevCaptain || rawState.p1.captain || "",
+                        tradeDone: !!rawState.p1.tradeDone,
+                        racesPlayed: rawState.raceCount || 0,
+                        tradeReplacements: {}
+                    });
+                }
+                if (rawState.p2) {
+                    rawState.users.push({
+                        id: "u_2",
+                        name: rawState.p2.name || "JACOPO",
+                        password: rawState.p2.password || "jacopo123",
+                        score: rawState.p2.score || 0,
+                        budget: typeof rawState.p2.budget === 'number' ? rawState.p2.budget : 170,
+                        initialBudget: rawState.p2.initialBudget || 170,
+                        roster: rawState.p2.roster || [],
+                        starters: rawState.p2.starters || [],
+                        captain: rawState.p2.captain || "",
+                        prevStarters: rawState.p2.prevStarters || [...(rawState.p2.starters || [])],
+                        prevCaptain: rawState.p2.prevCaptain || rawState.p2.captain || "",
+                        tradeDone: !!rawState.p2.tradeDone,
+                        racesPlayed: rawState.raceCount || 0,
+                        tradeReplacements: {}
+                    });
+                }
+            } else {
+                rawState.users.forEach(u => {
+                    if (!u.roster) u.roster = [];
+                    if (!u.starters) u.starters = [];
+                    if (typeof u.captain === 'undefined') u.captain = "";
+                    if (!u.prevStarters) u.prevStarters = [...u.starters];
+                    if (typeof u.prevCaptain === 'undefined') u.prevCaptain = u.captain || "";
+                    if (typeof u.racesPlayed === 'undefined') u.racesPlayed = rawState.raceCount || 0;
+                    if (!u.tradeReplacements) u.tradeReplacements = {};
+                });
+            }
+            return rawState;
+        }
+
+        // ==========================================
+        // AUTENTICAZIONE E REGISTRAZIONE
+        // ==========================================
+        function toggleAuthMode(mode) {
+            if (mode === 'register') {
+                document.getElementById('login-box').style.display = 'none';
+                document.getElementById('register-box').style.display = 'block';
+            } else {
+                document.getElementById('register-box').style.display = 'none';
+                document.getElementById('login-box').style.display = 'block';
+            }
+        }
+
+        function handleLogin() {
+            const username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value.trim();
+            const remember = document.getElementById('login-remember').checked;
+
+            if (!username || !password) {
+                alert("Inserisci nome utente e password!");
+                return;
+            }
+
+            const ok = attemptAuthenticate(username, password, remember);
+            if (!ok) {
+                alert("Credenziali non valide! Controlla nome utente e password oppure registrati.");
+            }
+        }
+
+        function attemptAuthenticate(username, password, saveToStorage) {
+            const cleanUser = username.trim().toUpperCase();
+
+            // 1. Verifica se sta accedendo come ADMIN (password === ADMIN_PASSWORD)
+            if (password === ADMIN_PASSWORD) {
+                isAdmin = true;
+                // Se l'admin ha anche un suo profilo squadra con lo stesso nome, lo colleghiamo, altrimenti usa il primo o un profilo admin virtuale
+                let linkedUser = state.users.find(u => u.name.toUpperCase() === cleanUser);
+                if (!linkedUser && state.users.length > 0) {
+                    linkedUser = state.users[0];
+                }
+                currentUserId = linkedUser ? linkedUser.id : null;
+
+                if (saveToStorage) {
+                    localStorage.setItem(STORAGE_AUTH_KEY, JSON.stringify({ username: cleanUser, password: password }));
+                }
+                enterApp(cleanUser, true);
+                return true;
+            }
+
+            // 2. Verifica se è un utente registrato con la sua password
+            const matchedUser = state.users.find(u => u.name.toUpperCase() === cleanUser && u.password === password);
+            if (matchedUser) {
+                isAdmin = false;
+                currentUserId = matchedUser.id;
+
+                if (saveToStorage) {
+                    localStorage.setItem(STORAGE_AUTH_KEY, JSON.stringify({ username: matchedUser.name, password: password }));
+                }
+                enterApp(matchedUser.name, false);
+                return true;
+            }
+
+            return false;
+        }
+
+        async function handleRegister() {
+            const rawName = document.getElementById('reg-username').value.trim();
+            const pass = document.getElementById('reg-password').value.trim();
+            const passConfirm = document.getElementById('reg-password-confirm').value.trim();
+            const remember = document.getElementById('reg-remember').checked;
+
+            if (!rawName || rawName.length < 2) {
+                alert("Inserisci un nome utente valido (almeno 2 caratteri).");
+                return;
+            }
+            if (!pass || pass.length < 4) {
+                alert("La password deve contenere almeno 4 caratteri.");
+                return;
+            }
+            if (pass === ADMIN_PASSWORD) {
+                alert("Questa password è riservata all'amministratore. Scegline un'altra.");
+                return;
+            }
+            if (pass !== passConfirm) {
+                alert("Le due password non coincidono!");
+                return;
+            }
+
+            const cleanName = rawName.toUpperCase();
+            if (state.users.some(u => u.name.toUpperCase() === cleanName)) {
+                alert("Esiste già un partecipante con questo nome! Scegli un altro nome utente.");
+                return;
+            }
+
+            const newUser = {
+                id: "u_" + Date.now(),
+                name: cleanName,
+                password: pass,
+                score: 0,
+                budget: 170,
+                initialBudget: 170,
+                roster: [],
+                starters: [],
+                captain: "",
+                prevStarters: [],
+                prevCaptain: "",
+                tradeDone: false,
+                racesPlayed: 0,
+                tradeReplacements: {}
+            };
+
+            state.users.push(newUser);
+            await saveState();
+
+            isAdmin = false;
+            currentUserId = newUser.id;
+
+            if (remember) {
+                localStorage.setItem(STORAGE_AUTH_KEY, JSON.stringify({ username: cleanName, password: pass }));
+            }
+
+            enterApp(cleanName, false);
+            alert(`Benvenuto ${cleanName}! Ora componi la tua rosa iniziale da 7 corridori (170 Cr) e poi schiera i 5 titolari con il Capitano.`);
+            switchTab('mercato');
+        }
+
+        function enterApp(displayName, adminFlag) {
+            document.getElementById('auth-screen').style.display = 'none';
+            document.getElementById('current-user-label').innerText = displayName;
+
+            const roleBadge = document.getElementById('role-badge');
+            const navGara = document.getElementById('nav-gara');
+            const cardAddRider = document.getElementById('card-add-rider');
+
+            if (adminFlag) {
+                roleBadge.innerText = "ADMIN";
+                roleBadge.style.background = "rgba(116, 245, 72, 0.2)";
+                roleBadge.style.color = "var(--primary)";
+                navGara.style.display = "block";
+                cardAddRider.style.display = "block";
+            } else {
+                roleBadge.innerText = "TEAM";
+                roleBadge.style.background = "#222";
+                roleBadge.style.color = "var(--text-secondary)";
+                navGara.style.display = "none";
+                cardAddRider.style.display = "none";
+            }
+
+            const activeUser = getCurrentUser();
+            const teamLabel = activeUser ? activeUser.name : displayName;
+            document.getElementById('lineup-team-display').innerText = teamLabel;
+            document.getElementById('market-team-display').innerText = teamLabel;
+
+            renderRaceInputs();
+            setDefaultRaceDate();
+            updateUI();
+
+            // Se l'utente non ha ancora completato la rosa da 7 corridori, lo portiamo subito a comporla
+            if (activeUser && activeUser.roster.length < 7) {
+                switchTab('mercato');
+            } else {
+                switchTab('home');
+            }
+        }
+
+        function logoutUser() {
+            localStorage.removeItem(STORAGE_AUTH_KEY);
+            currentUserId = null;
+            isAdmin = false;
+            document.getElementById('login-password').value = '';
+            toggleAuthMode('login');
+            document.getElementById('auth-screen').style.display = 'flex';
+        }
+
+        function getCurrentUser() {
+            if (!currentUserId) return null;
+            return state.users.find(u => u.id === currentUserId) || null;
+        }
+
+        // ==========================================
+        // TIMER SCADENZA FORMAZIONI & MERCATO
+        // ==========================================
+        function isDeadlinePassed() {
+            if (!state.nextDeadline) return false;
+            const deadlineTime = new Date(state.nextDeadline).getTime();
+            if (isNaN(deadlineTime)) return false;
+            return Date.now() > deadlineTime;
+        }
+
+        function formatDeadlineItalian(isoStr) {
+            if (!isoStr) return "";
+            const d = new Date(isoStr);
+            if (isNaN(d.getTime())) return isoStr;
+            const pad = n => String(n).padStart(2, '0');
+            return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} alle ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        }
+
+        function startDeadlineWatcher() {
+            if (deadlineInterval) clearInterval(deadlineInterval);
+            updateDeadlineBanner();
+            deadlineInterval = setInterval(updateDeadlineBanner, 15000);
+        }
+
+        function updateDeadlineBanner() {
+            const banner = document.getElementById('global-deadline-banner');
+            if (!banner) return;
+
+            if (!state.nextDeadline) {
+                banner.className = "deadline-banner";
+                banner.innerHTML = "Nessuna scadenza attiva: formazioni e scambi aperti";
+                return;
+            }
+
+            const deadlineMs = new Date(state.nextDeadline).getTime();
+            const diff = deadlineMs - Date.now();
+            const formatted = formatDeadlineItalian(state.nextDeadline);
+
+            if (diff <= 0) {
+                banner.className = "deadline-banner expired";
+                banner.innerHTML = `🔒 <b>TEMPO SCADUTO</b> (${formatted}) — Formazioni e scambi bloccati`;
+            } else {
+                const minsTotal = Math.floor(diff / 60000);
+                const hrs = Math.floor(minsTotal / 60);
+                const mins = minsTotal % 60;
+                const days = Math.floor(hrs / 24);
+                const remHrs = hrs % 24;
+                const countdownStr = days > 0 ? `${days}g ${remHrs}h ${mins}m` : `${hrs}h ${mins}m`;
+
+                banner.className = "deadline-banner";
+                banner.innerHTML = `⏱️ Scadenza invio: <b style="color:var(--primary);">${formatted}</b> (mancano <b>${countdownStr}</b>)`;
+            }
+        }
+
+        async function saveRaceDeadline() {
+            if (!isAdmin) return;
+            const val = document.getElementById('admin-deadline-input').value;
+            if (!val) {
+                alert("Seleziona una data e un'ora valida!");
+                return;
+            }
+            state.nextDeadline = val;
+            await saveState();
+            updateDeadlineBanner();
+            alert("Scadenza salvata e sincronizzata per tutti gli utenti!");
+        }
+
+        async function clearRaceDeadline() {
+            if (!isAdmin) return;
+            state.nextDeadline = null;
+            document.getElementById('admin-deadline-input').value = '';
+            await saveState();
+            updateDeadlineBanner();
+            alert("Limite di scadenza rimosso!");
+        }
+
+        // ==========================================
+        // GITHUB CLOUD SYNC
+        // ==========================================
+        function setSyncStatus(text, className) {
+            const el = document.getElementById('sync-indicator');
+            if (el) {
+                el.innerText = text;
+                el.className = "sync-status " + className;
+            }
+        }
+
+        async function loadStateFromGitHub() {
+            const url = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/${GITHUB_PATH}?t=${new Date().getTime()}`;
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error("Impossibile leggere il file db.json");
+                
+                const raw = await response.json();
+                state = normalizeStateSchema(raw);
+                setSyncStatus("Cloud Sync OK", "sync-ok");
+            } catch (error) {
+                console.error("Errore load:", error);
+                setSyncStatus("Errore connessione Cloud", "sync-err");
+            }
+        }
+
+        async function saveState() {
+            setSyncStatus("Salvataggio in corso...", "sync-sync");
+            const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${GITHUB_PATH}`;
+            
+            try {
+                const checkRes = await fetch(url, {
+                    headers: { 'Authorization': `token ${GITHUB_TOKEN}`, 'Accept': 'application/vnd.github.v3+json' }
+                });
+                if (checkRes.ok) {
+                    const checkData = await checkRes.json();
+                    fileSha = checkData.sha;
+                }
+
+                const jsonString = JSON.stringify(state, null, 2);
+                const contentBase64 = btoa(unescape(encodeURIComponent(jsonString)));
+
+                const response = await fetch(url, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${GITHUB_TOKEN}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/vnd.github.v3+json'
+                    },
+                    body: JSON.stringify({
+                        message: "Aggiornamento dati Fanta CX Multi-Utente",
+                        content: contentBase64,
+                        sha: fileSha
+                    })
+                });
+
+                if (response.ok) {
+                    const resData = await response.json();
+                    fileSha = resData.content.sha;
+                    setSyncStatus("Cloud Sync OK", "sync-ok");
+                } else {
+                    throw new Error("Errore salvataggio remoto");
+                }
+            } catch (error) {
+                console.error("Errore save:", error);
+                setSyncStatus("Errore salvataggio", "sync-err");
+                alert("Errore di sincronizzazione con GitHub!");
+            }
+            updateUI();
+        }
+
+        function setDefaultRaceDate() {
+            const dateInput = document.getElementById('race-date');
+            if (dateInput && !dateInput.value) {
+                const today = new Date().toISOString().split('T')[0];
+                dateInput.value = today;
+            }
+        }
+
+        function getSortedRidersAlphabetical() {
+            return [...state.riders].sort((a, b) => a.name.localeCompare(b.name));
+        }
+
+        function switchTab(tabId) {
+            if (tabId === 'gara' && !isAdmin) {
+                alert("Accesso riservato all'amministratore.");
+                return;
+            }
+
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            
+            const targetTab = document.getElementById('tab-' + tabId);
+            if (targetTab) targetTab.classList.add('active');
+            
+            const activeNav = document.getElementById('nav-' + tabId);
+            if (activeNav) activeNav.classList.add('active');
+
+            if (tabId === 'formazione') {
+                renderStartersInputs();
+            } else if (tabId === 'gara') {
+                renderRaceInputs();
+            } else if (tabId === 'historico') {
+                renderHistory();
+            } else if (tabId === 'mercato') {
+                renderMarketTab();
+            } else if (tabId === 'ranking') {
+                renderRanking();
+            } else if (tabId === 'home') {
+                updateUI();
+            }
+        }
+
+        // ==========================================
+        // RISOLUZIONE AUTOMATICA FORMAZIONE & CAPITANO (FALLBACK + SOSTITUTI)
+        // ==========================================
+        function resolveEffectiveLineup(user) {
+            // Se l'utente ha già schierato 5 titolari validi per la gara corrente
+            if (user.starters && user.starters.length === 5) {
+                const validCap = (user.captain && user.starters.includes(user.captain)) ? user.captain : user.starters[0];
+                return {
+                    starters: [...user.starters],
+                    captain: validCap,
+                    inherited: false
+                };
+            }
+
+            // Altrimenti eredita dalla gara precedente (prevStarters e prevCaptain)
+            const prevStarters = user.prevStarters || [];
+            const prevCaptain = user.prevCaptain || "";
+            const replacements = user.tradeReplacements || {};
+
+            if (prevStarters.length === 0) {
+                return { starters: [], captain: "", inherited: true };
+            }
+
+            // Funzione helper per risalire alla catena di sostituzioni di un corridore ceduto
+            function getCurrentReplacement(riderName) {
+                let curr = riderName;
+                const visited = new Set();
+                while (!user.roster.includes(curr) && replacements[curr] && !visited.has(curr)) {
+                    visited.add(curr);
+                    curr = replacements[curr];
+                }
+                return user.roster.includes(curr) ? curr : null;
+            }
+
+            const resolvedStarters = [];
+            prevStarters.forEach(oldRider => {
+                if (user.roster.includes(oldRider)) {
+                    if (!resolvedStarters.includes(oldRider)) resolvedStarters.push(oldRider);
+                } else {
+                    const sub = getCurrentReplacement(oldRider);
+                    if (sub && !resolvedStarters.includes(sub)) {
+                        resolvedStarters.push(sub);
+                    }
+                }
+            });
+
+            // Se per qualsiasi motivo mancano titolari per arrivare a 5, completa con i primi disponibili in rosa
+            if (resolvedStarters.length < 5 && user.roster.length >= 5) {
+                user.roster.forEach(rName => {
+                    if (resolvedStarters.length < 5 && !resolvedStarters.includes(rName)) {
+                        resolvedStarters.push(rName);
+                    }
+                });
+            }
+
+            // Risoluzione capitano
+            let resolvedCaptain = "";
+            if (prevCaptain) {
+                if (resolvedStarters.includes(prevCaptain)) {
+                    resolvedCaptain = prevCaptain;
+                } else {
+                    const subCap = getCurrentReplacement(prevCaptain);
+                    if (subCap && resolvedStarters.includes(subCap)) {
+                        resolvedCaptain = subCap;
+                    }
+                }
+            }
+            if (!resolvedCaptain && resolvedStarters.length > 0) {
+                resolvedCaptain = resolvedStarters[0];
+            }
+
+            return {
+                starters: resolvedStarters.slice(0, 5),
+                captain: resolvedCaptain,
+                inherited: true
+            };
+        }
+
+        // ==========================================
+        // RENDER UI HOME, LISTINO, RANKING
+        // ==========================================
+        let listinoSortKey = 'name';
+        let listinoSortAsc = true;
+
+        function setListinoSort(key) {
+            if (listinoSortKey === key) {
+                listinoSortAsc = !listinoSortAsc;
+            } else {
+                listinoSortKey = key;
+                listinoSortAsc = (key === 'name');
+            }
+            updateUI();
+        }
+
+        function updateUI() {
+            updateDeadlineBanner();
+
+            // 1. Classifica Generale ordinata per punti decrescenti
+            const sortedUsers = [...state.users].sort((a, b) => {
+                if (b.score !== a.score) return b.score - a.score;
+                return a.name.localeCompare(b.name);
+            });
+
+            const tbClassifica = document.getElementById('tb-classifica');
+            if (sortedUsers.length === 0) {
+                tbClassifica.innerHTML = `<tr><td colspan="4" style="color:var(--text-secondary);">Nessun partecipante registrato.</td></tr>`;
+            } else {
+                tbClassifica.innerHTML = sortedUsers.map((u, idx) => {
+                    const isMe = (u.id === currentUserId);
+                    return `<tr style="${isMe ? 'background:rgba(116, 245, 72, 0.08);' : ''}">
+                        <td style="color:var(--text-secondary);">${idx + 1}°</td>
+                        <td><b>${u.name}</b> ${isMe ? '<span style="font-size:0.7rem; color:var(--primary);">(TU)</span>' : ''}</td>
+                        <td><b style="color:var(--secondary);">${u.score} pt</b></td>
+                        <td>${u.budget} Cr</td>
+                    </tr>`;
+                }).join('');
+            }
+
+            // 2. La Mia Rosa
+            const me = getCurrentUser();
+            const myRosterCard = document.getElementById('my-roster-card');
+            if (me) {
+                myRosterCard.style.display = 'block';
+                document.getElementById('title-my-roster').innerText = `La Mia Rosa (${me.name})`;
+                renderSingleRosterTable('tb-my-roster', 'info-my-roster', me);
+            } else {
+                myRosterCard.style.display = 'none';
+            }
+
+            // 3. Rose Altri Partecipanti (Accordion compatto per scalare a N utenti)
+            const allRostersDiv = document.getElementById('all-rosters-container');
+            const otherUsers = sortedUsers.filter(u => u.id !== currentUserId);
+            if (otherUsers.length === 0) {
+                allRostersDiv.innerHTML = `<p style="color:var(--text-secondary); font-size:0.85rem;">Nessun altro partecipante presente.</p>`;
+            } else {
+                allRostersDiv.innerHTML = otherUsers.map(u => {
+                    const eff = resolveEffectiveLineup(u);
+                    let totalVal = 0;
+                    const rowsHtml = (u.roster || []).map(rName => {
+                        const rObj = state.riders.find(x => x.name === rName);
+                        const val = rObj ? rObj.value : 0;
+                        totalVal += val;
+                        const isStarter = eff.starters.includes(rName);
+                        const isCap = (eff.captain === rName);
+                        return `<tr>
+                            <td>
+                                ${rName}
+                                ${isStarter ? '<span class="status-badge status-ok">TIT</span>' : ''}
+                                ${isCap ? '<span class="status-badge status-cap">C (x2)</span>' : ''}
+                            </td>
+                            <td style="text-align:right;">${val} Cr</td>
+                        </tr>`;
+                    }).join('');
+
+                    return `
+                        <div class="user-roster-card">
+                            <div class="user-roster-header" onclick="toggleOtherRoster('other-roster-${u.id}')">
+                                <div>
+                                    <b style="color:var(--primary);">${u.name}</b>
+                                    <span style="font-size:0.75rem; color:var(--text-secondary); margin-left:6px;">(${u.score} pt | Res: ${u.budget} Cr)</span>
+                                </div>
+                                <span style="font-size:0.8rem; color:var(--text-secondary);">▼</span>
+                            </div>
+                            <div id="other-roster-${u.id}" style="display:none; margin-top:8px;">
+                                ${u.roster.length === 0 
+                                    ? '<p style="font-size:0.8rem; color:var(--error);">Rosa non ancora definita</p>' 
+                                    : `<p style="font-size:0.78rem; color:var(--text-secondary); margin-bottom:4px;">Valore Rosa: <b>${totalVal} Cr</b> ${eff.inherited && eff.starters.length === 5 ? '(Formazione ereditata)' : ''}</p>
+                                       <table><tbody>${rowsHtml}</tbody></table>`
+                                }
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            // 4. Listino Corridori
+            let ridersWithDetails = state.riders.map(r => {
+                let totalRiderPts = 0;
+                if (state.raceHistory && state.raceHistory.length > 0) {
+                    state.raceHistory.forEach(h => {
+                        totalRiderPts += calculateRiderPoints(r.name, h.type, h.top10 || [], h.dnfs || []);
+                    });
+                }
+                return { name: r.name, value: r.value, points: totalRiderPts };
+            });
+
+            ridersWithDetails.sort((a, b) => {
+                let valA = a[listinoSortKey];
+                let valB = b[listinoSortKey];
+                if (listinoSortKey === 'name') {
+                    let cmp = valA.localeCompare(valB);
+                    return listinoSortAsc ? cmp : -cmp;
+                } else {
+                    let cmp = valA - valB;
+                    return listinoSortAsc ? cmp : -cmp;
+                }
+            });
+
+            let listinoHtml = '';
+            ridersWithDetails.forEach(r => {
+                const ptsColor = r.points > 0 ? 'var(--secondary)' : (r.points < 0 ? 'var(--error)' : 'var(--text-secondary)');
+                listinoHtml += `<tr>
+                    <td onclick="openRiderDetail('${r.name.replace(/'/g, "\'")}')" style="cursor:pointer; text-decoration:underline; text-decoration-color:rgba(116, 245, 72, 0.4);">${r.name}</td>
+                    <td><b>${r.value} Cr</b></td>
+                    <td style="color:${ptsColor}; font-weight:bold;">${r.points} pt</td>
+                </tr>`;
+            });
+            document.getElementById('tb-listino').innerHTML = listinoHtml;
+
+            renderRanking();
+        }
+
+        function toggleOtherRoster(elemId) {
+            const el = document.getElementById(elemId);
+            if (!el) return;
+            el.style.display = (el.style.display === 'none') ? 'block' : 'none';
+        }
+
+        function renderSingleRosterTable(tbodyId, infoId, participant) {
+            const tbody = document.getElementById(tbodyId);
+            const infoDiv = document.getElementById(infoId);
+            
+            if (!participant.roster || participant.roster.length === 0) {
+                infoDiv.innerHTML = `<div class="alert">Rosa non ancora completata! Vai nella scheda <b>Mercato</b> per scegliere i tuoi 7 corridori.</div>`;
+                tbody.innerHTML = '';
+                return;
+            }
+
+            const eff = resolveEffectiveLineup(participant);
+            let totalVal = 0;
+            let html = '';
+
+            participant.roster.forEach(rName => {
+                const r = state.riders.find(x => x.name === rName);
+                const val = r ? r.value : 0;
+                totalVal += val;
+                const isStarter = eff.starters.includes(rName);
+                const isCap = (eff.captain === rName);
+
+                html += `<tr>
+                    <td>
+                        ${rName} 
+                        ${isStarter ? '<span class="status-badge status-ok">TITOLARE</span>' : ''} 
+                        ${isCap ? '<span class="status-badge status-cap">CAPITANO x2</span>' : ''}
+                    </td>
+                    <td style="text-align:right;">${val} Cr</td>
+                </tr>`;
+            });
+
+            const inheritedNote = (eff.inherited && eff.starters.length === 5) 
+                ? `<div style="font-size:0.75rem; color:#ffd700; margin-bottom:6px;">ℹ️ Formazione e capitano provvisoriamente ereditati dalla gara precedente.</div>` 
+                : '';
+
+            infoDiv.innerHTML = `
+                <p style="font-size:0.85rem; margin-bottom:6px;">Valore Squadra: <b>${totalVal} Cr</b> | Budget Residuo: <b>${participant.budget} Cr</b></p>
+                ${inheritedNote}
+            `;
+            tbody.innerHTML = html;
+        }
+
+        function renderRanking() {
+            const tbody = document.getElementById('tb-ranking');
+            if (!tbody) return;
+
+            const riderNamesSet = new Set(state.riders.map(r => r.name));
+            Object.keys(rankingInitialPoints).forEach(name => riderNamesSet.add(name));
+            if (state.raceHistory) {
+                state.raceHistory.forEach(h => {
+                    (h.top10 || []).forEach(name => {
+                        if (name) riderNamesSet.add(name);
+                    });
+                });
+            }
+
+            const rankingList = Array.from(riderNamesSet).map(name => {
+                const initPts = rankingInitialPoints[name] || 0;
+                let racePts = 0;
+
+                if (state.raceHistory && state.raceHistory.length > 0) {
+                    state.raceHistory.forEach(h => {
+                        const posIndex = (h.top10 || []).indexOf(name);
+                        if (posIndex !== -1 && posIndex < 10) {
+                            racePts += rankingRacePoints[posIndex];
+                        }
+                    });
+                }
+
+                return {
+                    name: name,
+                    totalPts: initPts + racePts
+                };
+            });
+
+            rankingList.sort((a, b) => {
+                if (b.totalPts !== a.totalPts) return b.totalPts - a.totalPts;
+                return a.name.localeCompare(b.name);
+            });
+
+            let html = '';
+            rankingList.forEach((r, idx) => {
+                const ptsColor = r.totalPts > 0 ? 'var(--secondary)' : 'var(--text-secondary)';
+                html += `<tr>
+                    <td style="color:var(--text-secondary);">${idx + 1}°</td>
+                    <td onclick="openRiderDetail('${r.name.replace(/'/g, "\'")}')" style="cursor:pointer; text-decoration:underline; text-decoration-color:rgba(116, 245, 72, 0.4);">${r.name}</td>
+                    <td style="text-align:right; color:${ptsColor}; font-weight:bold;">${r.totalPts} pt</td>
+                </tr>`;
+            });
+
+            tbody.innerHTML = html;
+        }
+
+        // ==========================================
+        // AGGIUNTA CORRIDORE (SOLO ADMIN)
+        // ==========================================
+        async function addNewRider() {
+            if (!isAdmin) return;
+            const inputName = document.getElementById('new-rider-name');
+            const inputVal = document.getElementById('new-rider-val');
+
+            const rName = inputName.value.trim().toLowerCase();
+            const rVal = parseInt(inputVal.value, 10);
+
+            if (!rName) {
+                alert("Inserisci il nome del corridore!");
+                return;
+            }
+            if (isNaN(rVal) || rVal < 1) {
+                alert("Inserisci un valore in crediti valido (almeno 1)!");
+                return;
+            }
+            if (state.riders.some(r => r.name === rName)) {
+                alert("Questo corridore è già presente nel listino!");
+                return;
+            }
+
+            state.riders.push({ name: rName, value: rVal });
+            inputName.value = '';
+            inputVal.value = '1';
+
+            await saveState();
+            alert(`Corridore "${rName}" aggiunto al listino con valore ${rVal} Cr!`);
+        }
+
+        // ==========================================
+        // SCHIERAMENTO FORMAZIONE & CAPITANO
+        // ==========================================
+        function renderStartersInputs() {
+            const p = getCurrentUser();
+            const container = document.getElementById('starters-checkboxes');
+            const statusMsg = document.getElementById('lineup-status-msg');
+            const formContainer = document.getElementById('lineup-form-container');
+            const deadlineAlert = document.getElementById('lineup-deadline-alert');
+            const saveBtn = document.getElementById('btn-save-lineup');
+
+            if (!p) {
+                statusMsg.innerHTML = `<div class="alert">Nessun team associato a questo account.</div>`;
+                formContainer.style.display = 'none';
+                return;
+            }
+
+            const expired = isDeadlinePassed();
+            if (expired) {
+                deadlineAlert.innerHTML = `<div class="alert">🔒 Tempo scaduto (${formatDeadlineItalian(state.nextDeadline)}): non è più possibile modificare la formazione o il capitano per questa gara.</div>`;
+            } else {
+                deadlineAlert.innerHTML = '';
+            }
+
+            if (!p.roster || p.roster.length < 7) {
+                statusMsg.innerHTML = `<div class="alert">La tua rosa non è ancora completa (servono 7 corridori)! Vai nella scheda <b>Mercato</b>.</div>`;
+                formContainer.style.display = 'none';
+                return;
+            }
+
+            statusMsg.innerHTML = '';
+            formContainer.style.display = 'block';
+
+            // Pre-compila con formazione corrente oppure con quella risolta dalla gara precedente
+            const eff = resolveEffectiveLineup(p);
+            const activeStarters = eff.starters;
+            const activeCaptain = eff.captain;
+
+            if (eff.inherited && activeStarters.length === 5 && !expired) {
+                statusMsg.innerHTML = `<div class="info-box">ℹ️ Formazione pre-compilata dalla gara precedente (eventuali corridori ceduti sono già stati sostituiti). Conferma o modifica entro la scadenza.</div>`;
+            }
+
+            container.innerHTML = p.roster.map((rName, idx) => {
+                const isChecked = activeStarters.includes(rName);
+                const isCap = (activeCaptain === rName);
+                return `
+                    <div class="starter-row">
+                        <div class="starter-left">
+                            <input type="checkbox" name="starter-player" value="${rName}" id="chk-${idx}" ${isChecked ? 'checked' : ''} ${expired ? 'disabled' : ''} onchange="onStarterToggle(this, ${idx})">
+                            <label for="chk-${idx}">${rName}</label>
+                        </div>
+                        <label class="captain-pill ${isCap ? 'active-cap' : ''}" id="cap-pill-${idx}">
+                            <input type="radio" name="captain-player" value="${rName}" id="rad-${idx}" ${isCap ? 'checked' : ''} ${(!isChecked || expired) ? 'disabled' : ''} onchange="onCaptainChange()">
+                            Capitano (C)
+                        </label>
+                    </div>`;
+            }).join('');
+
+            saveBtn.disabled = expired;
+        }
+
+        function onStarterToggle(checkboxEl, idx) {
+            const checkboxes = Array.from(document.getElementsByName('starter-player'));
+            const checkedCount = checkboxes.filter(c => c.checked).length;
+
+            if (checkedCount > 5) {
+                checkboxEl.checked = false;
+                alert("Puoi selezionare al massimo 5 titolari!");
+                return;
+            }
+
+            const radioEl = document.getElementById(`rad-${idx}`);
+            const pillEl = document.getElementById(`cap-pill-${idx}`);
+            if (checkboxEl.checked) {
+                radioEl.disabled = false;
+            } else {
+                radioEl.checked = false;
+                radioEl.disabled = true;
+                pillEl.classList.remove('active-cap');
+            }
+        }
+
+        function onCaptainChange() {
+            const radios = Array.from(document.getElementsByName('captain-player'));
+            radios.forEach((r, idx) => {
+                const pill = document.getElementById(`cap-pill-${idx}`);
+                if (pill) {
+                    if (r.checked) pill.classList.add('active-cap');
+                    else pill.classList.remove('active-cap');
+                }
+            });
+        }
+
+        async function saveLineup() {
+            if (isDeadlinePassed()) {
+                alert("Tempo scaduto! Impossibile salvare la formazione.");
+                return;
+            }
+
+            const p = getCurrentUser();
+            if (!p) return;
+
+            const selectedStarters = Array.from(document.getElementsByName('starter-player'))
+                .filter(c => c.checked).map(c => c.value);
+
+            if (selectedStarters.length !== 5) {
+                alert("Devi selezionare esattamente 5 titolari!");
+                return;
+            }
+
+            const selectedCaptainEl = Array.from(document.getElementsByName('captain-player')).find(r => r.checked);
+            if (!selectedCaptainEl || !selectedStarters.includes(selectedCaptainEl.value)) {
+                alert("Devi selezionare 1 Capitano tra i 5 titolari schierati!");
+                return;
+            }
+
+            p.starters = selectedStarters;
+            p.captain = selectedCaptainEl.value;
+
+            await saveState();
+            alert(`Formazione e Capitano (${p.captain}) salvati con successo!`);
+            switchTab('home');
+        }
+
+        // ==========================================
+        // MERCATO & CREAZIONE ROSA INIZIALE NUOVI UTENTI
+        // ==========================================
+        function renderMarketTab() {
+            const p = getCurrentUser();
+            const initCard = document.getElementById('initial-roster-builder-card');
+            const stdCard = document.getElementById('standard-market-card');
+            const deadlineAlert = document.getElementById('market-deadline-alert');
+
+            if (!p) return;
+
+            const expired = isDeadlinePassed();
+            const isFirstRacePhase = ((p.racesPlayed || 0) === 0 && state.raceCount === 0) || (p.roster.length < 7);
+
+            // Caso A: Nuovo utente prima della sua prima gara (può comporre/modificare liberamente la rosa da 7 corridori entro 170 Cr fino alla scadenza)
+            if (isFirstRacePhase) {
+                stdCard.style.display = 'none';
+                initCard.style.display = 'block';
+                renderInitialRosterBuilder(p, expired);
+                return;
+            }
+
+            // Caso B: Mercato standard (1 scambio a gara entro la scadenza)
+            initCard.style.display = 'none';
+            stdCard.style.display = 'block';
+
+            if (expired) {
+                deadlineAlert.innerHTML = `<div class="alert">🔒 Tempo scaduto (${formatDeadlineItalian(state.nextDeadline)}): il mercato è chiuso fino alla prossima gara.</div>`;
+                document.getElementById('market-form-container').style.display = 'none';
+                document.getElementById('market-status-msg').innerHTML = '';
+                return;
+            } else {
+                deadlineAlert.innerHTML = '';
+            }
+
+            resetAndRenderMarketOptions();
+        }
+
+        function renderInitialRosterBuilder(user, expired) {
+            const container = document.getElementById('init-builder-selects');
+            const saveBtn = document.getElementById('btn-save-new-roster');
+            const sortedRiders = getSortedRidersAlphabetical();
+
+            if (expired) {
+                container.innerHTML = `<div class="alert">🔒 Tempo scaduto (${formatDeadlineItalian(state.nextDeadline)}): non è più possibile modificare la rosa iniziale.</div>`;
+                saveBtn.style.display = 'none';
+                return;
+            }
+
+            saveBtn.style.display = 'block';
+            let html = '';
+            for (let i = 0; i < 7; i++) {
+                const currentVal = user.roster[i] || "";
+                html += `
+                    <div class="form-group">
+                        <label>Corridore ${i + 1}</label>
+                        <select id="new-user-slot-${i}" onchange="checkNewUserBuilderBudget()">
+                            <option value="">-- Seleziona Corridore --</option>
+                            ${sortedRiders.map(r => `<option value="${r.name}" ${r.name === currentVal ? 'selected' : ''}>${r.name} (${r.value} Cr)</option>`).join('')}
+                        </select>
+                    </div>`;
+            }
+            container.innerHTML = html;
+            checkNewUserBuilderBudget();
+        }
+
+        function checkNewUserBuilderBudget() {
+            const p = getCurrentUser();
+            if (!p) return;
+
+            let spent = 0;
+            const chosen = [];
+            let hasDuplicates = false;
+
+            for (let i = 0; i < 7; i++) {
+                const val = document.getElementById(`new-user-slot-${i}`)?.value;
+                if (val) {
+                    if (chosen.includes(val)) hasDuplicates = true;
+                    chosen.push(val);
+                    spent += state.riders.find(r => r.name === val)?.value || 0;
+                }
+            }
+
+            const maxB = p.initialBudget || 170;
+            const statusEl = document.getElementById('init-builder-budget');
+            const saveBtn = document.getElementById('btn-save-new-roster');
+
+            if (hasDuplicates) {
+                statusEl.innerHTML = `<span style="color:var(--error);">⚠️ Hai selezionato lo stesso corridore più volte!</span>`;
+                saveBtn.disabled = true;
+                return;
+            }
+
+            statusEl.innerHTML = `Budget Speso: <b style="color:${spent <= maxB ? 'var(--secondary)' : 'var(--error)'}">${spent} / ${maxB} Cr</b> (Residuo: <b>${maxB - spent} Cr</b>)`;
+            saveBtn.disabled = (spent > maxB || chosen.length < 7);
+        }
+
+        async function saveNewUserInitialRoster() {
+            if (isDeadlinePassed()) {
+                alert("Tempo scaduto!");
+                return;
+            }
+
+            const p = getCurrentUser();
+            if (!p) return;
+
+            const chosen = [];
+            for (let i = 0; i < 7; i++) {
+                const val = document.getElementById(`new-user-slot-${i}`).value;
+                if (val && !chosen.includes(val)) chosen.push(val);
+            }
+
+            if (chosen.length !== 7) {
+                alert("Devi selezionare 7 corridori diversi!");
+                return;
+            }
+
+            const spent = chosen.reduce((sum, name) => sum + (state.riders.find(r => r.name === name)?.value || 0), 0);
+            const maxB = p.initialBudget || 170;
+            if (spent > maxB) {
+                alert("Budget superato!");
+                return;
+            }
+
+            p.roster = chosen;
+            p.budget = maxB - spent;
+            // Mantiene solo eventuali titolari/capitano ancora presenti nella nuova rosa
+            p.starters = (p.starters || []).filter(r => chosen.includes(r));
+            if (!chosen.includes(p.captain)) p.captain = "";
+
+            await saveState();
+            alert("Rosa salvata con successo! Ora vai nella scheda Formazione per scegliere i 5 titolari e il Capitano.");
+            switchTab('formazione');
+        }
+
+        function resetAndRenderMarketOptions() {
+            const p = getCurrentUser();
+            if (!p) return;
+
+            const statusMsg = document.getElementById('market-status-msg');
+            const container = document.getElementById('market-form-container');
+
+            if (p.tradeDone) {
+                statusMsg.innerHTML = `<div class="alert">${p.name} ha già effettuato lo scambio per questa gara!</div>`;
+                container.style.display = 'none';
+                return;
+            }
+
+            statusMsg.innerHTML = '';
+            container.style.display = 'block';
+
+            const outSel = document.getElementById('market-out');
+            outSel.innerHTML = `<option value="">-- Seleziona --</option>` + p.roster.map(rName => {
+                const r = state.riders.find(x => x.name === rName);
+                return `<option value="${rName}">${rName} (${r ? r.value : 0} Cr)</option>`;
+            }).join('');
+
+            const inSel = document.getElementById('market-in');
+            inSel.innerHTML = `<option value="">-- Seleziona prima il corridore da cedere --</option>`;
+            inSel.disabled = true;
+
+            document.getElementById('market-calc').innerHTML = `
+                <p>Budget Attuale: <b>${p.budget} Cr</b></p>
+                <p style="font-size:0.85rem; color:var(--text-secondary); margin-top:4px;">Seleziona un corridore dalla rosa da cedere per procedere.</p>
+            `;
+            document.getElementById('btn-execute-trade').disabled = true;
+        }
+
+        function onMarketOutChange() {
+            const p = getCurrentUser();
+            if (!p) return;
+
+            const outName = document.getElementById('market-out').value;
+            const inSel = document.getElementById('market-in');
+
+            if (!outName) {
+                inSel.innerHTML = `<option value="">-- Seleziona prima il corridore da cedere --</option>`;
+                inSel.disabled = true;
+                document.getElementById('market-calc').innerHTML = `<p>Budget Attuale: <b>${p.budget} Cr</b></p>`;
+                document.getElementById('btn-execute-trade').disabled = true;
+                return;
+            }
+
+            const outRider = state.riders.find(r => r.name === outName);
+            const outVal = outRider ? outRider.value : 0;
+            const maxBudgetAvailable = p.budget + outVal;
+
+            const availableRiders = getSortedRidersAlphabetical().filter(r => !p.roster.includes(r.name) && r.value <= maxBudgetAvailable);
+
+            inSel.disabled = false;
+            inSel.innerHTML = `<option value="">-- Seleziona --</option>` + availableRiders.map(r => 
+                `<option value="${r.name}">${r.name} (${r.value} Cr)</option>`
+            ).join('');
+
+            updateMarketCalculations();
+        }
+
+        function updateMarketCalculations() {
+            const p = getCurrentUser();
+            if (!p) return;
+
+            const outName = document.getElementById('market-out').value;
+            const inName = document.getElementById('market-in').value;
+
+            if (!outName) return;
+
+            const outRider = state.riders.find(r => r.name === outName);
+            const outVal = outRider ? outRider.value : 0;
+
+            const inRider = state.riders.find(r => r.name === inName);
+            const inVal = inRider ? inRider.value : 0;
+
+            const newBudget = p.budget + outVal - inVal;
+
+            const calcDiv = document.getElementById('market-calc');
+            calcDiv.innerHTML = `
+                <p>Budget Attuale: <b>${p.budget} Cr</b></p>
+                <p>Valore Corridore Ceduto: <b>+${outVal} Cr</b></p>
+                ${inName ? `<p>Valore Corridore Acquistato: <b>-${inVal} Cr</b></p>` : ''}
+                <hr style="margin:8px 0; border-color:var(--border);">
+                <p style="font-size:1rem;">Nuovo Budget Residuo: <b style="color:${newBudget >= 0 ? 'var(--secondary)' : 'var(--error)'}">${newBudget} Cr</b></p>
+            `;
+
+            document.getElementById('btn-execute-trade').disabled = (newBudget < 0 || !inName || !outName);
+        }
+
+        async function executeTrade() {
+            if (isDeadlinePassed()) {
+                alert("Tempo scaduto! Non puoi più effettuare scambi per questa gara.");
+                return;
+            }
+
+            const p = getCurrentUser();
+            if (!p) return;
+
+            const outName = document.getElementById('market-out').value;
+            const inName = document.getElementById('market-in').value;
+
+            const outRider = state.riders.find(r => r.name === outName);
+            const inRider = state.riders.find(r => r.name === inName);
+
+            if (!outRider || !inRider) return;
+
+            const newBudget = p.budget + outRider.value - inRider.value;
+            if (newBudget < 0) {
+                alert("Operazione non consentita: il budget residuo andrebbe sotto zero!");
+                return;
+            }
+
+            // Registra la mappatura di sostituzione (utile se l'utente non dovesse schierare la formazione entro la scadenza)
+            if (!p.tradeReplacements) p.tradeReplacements = {};
+            p.tradeReplacements[outName] = inName;
+
+            p.roster = p.roster.filter(r => r !== outName);
+            p.roster.push(inName);
+
+            // Se il corridore ceduto era tra i titolari già schierati per questa gara, viene sostituito automaticamente
+            if (p.starters && p.starters.includes(outName)) {
+                p.starters = p.starters.map(r => r === outName ? inName : r);
+            }
+            if (p.captain === outName) {
+                p.captain = inName;
+            }
+
+            p.budget = newBudget;
+            p.tradeDone = true;
+
+            await saveState();
+            alert(`Scambio effettuato e sincronizzato!
+Cessione: ${outName}
+Acquisto: ${inName}`);
+            
+            renderMarketTab();
+            switchTab('home');
+        }
+
+        // ==========================================
+        // GESTIONE GARA (ADMIN) & CALCOLO PUNTEGGI MULTI-UTENTE
+        // ==========================================
+        function renderRaceInputs() {
+            if (!isAdmin) return;
+
+            const deadlineInput = document.getElementById('admin-deadline-input');
+            if (deadlineInput) {
+                deadlineInput.value = state.nextDeadline || '';
+            }
+
+            // Riepilogo stato formazioni di tutti gli utenti registrati
+            const summaryDiv = document.getElementById('admin-users-summary');
+            const activeUsers = state.users.filter(u => u.roster && u.roster.length === 7);
+
+            if (activeUsers.length === 0) {
+                summaryDiv.innerHTML = `<div class="alert">Nessun partecipante ha ancora completato la rosa da 7 corridori!</div>`;
+            } else {
+                const lines = activeUsers.map(u => {
+                    const eff = resolveEffectiveLineup(u);
+                    if (eff.starters.length < 5) {
+                        return `<li style="color:var(--error);"><b>${u.name}</b>: Nessuna formazione schierata né precedente (0 pt)</li>`;
+                    } else if (eff.inherited) {
+                        return `<li style="color:#ffd700;"><b>${u.name}</b>: Erediterà formazione precedente [Cap: ${eff.captain}]</li>`;
+                    } else {
+                        return `<li style="color:var(--secondary);"><b>${u.name}</b>: Formazione schierata ✓ [Cap: ${eff.captain}]</li>`;
+                    }
+                }).join('');
+
+                summaryDiv.innerHTML = `
+                    <div style="background:#1c1c1c; border:1px solid #333; border-radius:6px; padding:10px; font-size:0.78rem;">
+                        <b style="color:var(--primary);">Stato Formazioni Partecipanti (${activeUsers.length}):</b>
+                        <ul style="padding-left:18px; margin-top:5px;">${lines}</ul>
+                    </div>
+                `;
+            }
+
+            const top10Div = document.getElementById('top10-inputs');
+            top10Div.innerHTML = '';
+            for (let i = 0; i < 10; i++) {
+                top10Div.innerHTML += `
+                    <div class="form-group">
+                        <label>${i + 1}° Posizione</label>
+                        <select class="top10-select" id="pos-${i}" onchange="syncRaceSelections()">
+                            <option value="">-- Nessuno --</option>
+                        </select>
+                    </div>`;
+            }
+
+            document.getElementById('dnf-inputs').innerHTML = '';
+            addDnfField();
+            populateRaceDropdowns();
+            setDefaultRaceDate();
+            cancelPreview();
+        }
+
+        function addDnfField() {
+            const dnfDiv = document.getElementById('dnf-inputs');
+            const idx = dnfDiv.children.length;
+            const newDiv = document.createElement('div');
+            newDiv.className = 'form-group';
+            newDiv.innerHTML = `
+                <select class="dnf-select" id="dnf-${idx}" onchange="syncRaceSelections()">
+                    <option value="">-- Nessuno --</option>
+                </select>`;
+            dnfDiv.appendChild(newDiv);
+            populateRaceDropdowns();
+        }
+
+        function populateRaceDropdowns() {
+            const sortedRiders = getSortedRidersAlphabetical();
+            document.querySelectorAll('.top10-select, .dnf-select').forEach(sel => {
+                const currentVal = sel.value;
+                sel.innerHTML = `<option value="">-- Nessuno --</option>` + 
+                    sortedRiders.map(r => `<option value="${r.name}">${r.name}</option>`).join('');
+                sel.value = currentVal;
+            });
+        }
+
+        function syncRaceSelections() {
+            const selectedTop10 = Array.from(document.querySelectorAll('.top10-select')).map(s => s.value).filter(v => v !== '');
+            const selectedDnf = Array.from(document.querySelectorAll('.dnf-select')).map(s => s.value).filter(v => v !== '');
+
+            document.querySelectorAll('.top10-select').forEach(sel => {
+                if (selectedDnf.includes(sel.value) && sel.value !== '') sel.value = '';
+            });
+            document.querySelectorAll('.dnf-select').forEach(sel => {
+                if (selectedTop10.includes(sel.value) && sel.value !== '') sel.value = '';
+            });
+        }
+
+        function calculateRiderPoints(rName, raceType, top10, dnfs) {
+            let pts = 0;
+            const posIndex = top10.indexOf(rName);
+
+            if (posIndex !== -1) {
+                pts += pointsTable[raceType][posIndex];
+            } else if (dnfs.includes(rName)) {
+                pts += (raceType === 'Camp. Nazionali') ? 0 : -5;
+            }
+            return pts;
+        }
+
+        function generateRacePreview() {
+            if (!isAdmin) return;
+
+            const raceType = document.getElementById('race-type').value;
+            const raceName = document.getElementById('race-name').value.trim() || 'Gara Sconosciuta';
+            const raceDate = document.getElementById('race-date').value || new Date().toISOString().split('T')[0];
+
+            const top10 = [];
+            for (let i = 0; i < 10; i++) {
+                const val = document.getElementById(`pos-${i}`).value;
+                top10.push(val || null);
+            }
+
+            const dnfs = Array.from(document.querySelectorAll('.dnf-select')).map(s => s.value).filter(v => v !== '');
+
+            // Calcolo punteggi per ogni utente registrato
+            const userResults = [];
+            state.users.forEach(u => {
+                if (!u.roster || u.roster.length < 7) return;
+
+                const eff = resolveEffectiveLineup(u);
+                let totalUserPts = 0;
+                const details = [];
+
+                eff.starters.forEach(rName => {
+                    const basePts = calculateRiderPoints(rName, raceType, top10, dnfs);
+                    const isCap = (eff.captain === rName);
+                    const finalPts = isCap ? basePts * 2 : basePts;
+                    totalUserPts += finalPts;
+                    details.push({
+                        name: rName,
+                        points: finalPts,
+                        isCaptain: isCap
+                    });
+                });
+
+                userResults.push({
+                    userId: u.id,
+                    userName: u.name,
+                    totalPoints: totalUserPts,
+                    captain: eff.captain,
+                    inherited: eff.inherited,
+                    starters: eff.starters,
+                    details: details
+                });
+            });
+
+            // Calcolo variazioni listino
+            const priceChanges = [];
+            state.riders.forEach(r => {
+                let delta = 0;
+                const posIndex = top10.indexOf(r.name);
+                if (posIndex !== -1) {
+                    delta = priceTable[raceType][posIndex];
+                } else if (dnfs.includes(r.name)) {
+                    delta = (raceType === 'Camp. Nazionali') ? 0 : -1;
+                }
+
+                if (delta !== 0) {
+                    const oldVal = r.value;
+                    const newVal = Math.max(1, r.value + delta);
+                    const realDelta = newVal - oldVal;
+                    if (realDelta !== 0) {
+                        priceChanges.push({ name: r.name, delta: realDelta, newVal: newVal });
+                    }
+                }
+            });
+
+            currentPendingRace = {
+                type: raceType,
+                name: raceName,
+                date: raceDate,
+                top10: top10,
+                dnfs: dnfs,
+                userResults: userResults,
+                priceChanges: priceChanges
+            };
+
+            const formattedDate = raceDate ? raceDate.split('-').reverse().join('/') : 'N.D.';
+
+            let usersPreviewHtml = userResults.map(ur => `
+                <p style="font-size:0.85rem; margin-top:6px;">
+                    <b>${ur.userName}: ${ur.totalPoints >= 0 ? '+' : ''}${ur.totalPoints} pt</b>
+                    ${ur.inherited ? '<span style="font-size:0.7rem; color:#ffd700;"> (Formazione ereditata)</span>' : ''}
+                </p>
+                <ul style="font-size:0.75rem; color:var(--text-secondary); padding-left:18px; margin-bottom:6px;">
+                    ${ur.details.map(d => `
+                        <li>
+                            ${d.name} ${d.isCaptain ? '<b style="color:#ffd700;">[C x2]</b>' : ''}: 
+                            <b style="color:${d.points >= 0 ? 'var(--secondary)' : 'var(--error)'}">${d.points >= 0 ? '+' : ''}${d.points} pt</b>
+                        </li>
+                    `).join('')}
+                </ul>
+            `).join('');
+
+            let previewHtml = `
+                <p style="font-size:0.9rem; margin-bottom:4px;"><b>Gara:</b> ${raceName} (${raceType})</p>
+                <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:12px;"><b>Data:</b> ${formattedDate}</p>
+                
+                <h4 style="color:var(--primary); font-size:0.85rem; margin-top:10px;">Top 10 Arrivo & DNF</h4>
+                <ol class="list-numbered" style="padding-left:20px; list-style-type:decimal; margin-bottom:10px;">
+                    ${top10.map(r => `<li>${r ? r : '<i>-- vuoto --</i>'}</li>`).join('')}
+                </ol>
+                ${dnfs.length > 0 ? `<p style="font-size:0.8rem; color:var(--error); margin-bottom:10px;"><b>DNF:</b> ${dnfs.join(', ')}</p>` : ''}
+
+                <hr style="border-color:var(--border); margin:10px 0;">
+
+                <h4 style="color:var(--primary); font-size:0.85rem;">Punteggi Partecipanti</h4>
+                ${usersPreviewHtml || '<p style="font-size:0.8rem; color:#888;">Nessun partecipante attivo</p>'}
+
+                <h4 style="color:var(--primary); font-size:0.85rem; margin-top:10px;">Variazioni Listino Previste</h4>
+                ${priceChanges.length === 0 ? '<p style="font-size:0.75rem; color:#888;">Nessuna variazione</p>' : ''}
+                <ul style="font-size:0.75rem; padding-left:18px; margin-bottom:15px;">
+                    ${priceChanges.map(c => `<li>${c.name}: <span class="${c.delta > 0 ? 'val-plus' : 'val-minus'}">${c.delta > 0 ? '+' : ''}${c.delta} Cr</span> (nuovo val: ${c.newVal} Cr)</li>`).join('')}
+                </ul>
+            `;
+
+            document.getElementById('preview-content').innerHTML = previewHtml;
+            document.getElementById('race-form-container').style.display = 'none';
+            document.getElementById('race-preview-container').style.display = 'block';
+        }
+
+        function cancelPreview() {
+            currentPendingRace = null;
+            document.getElementById('race-preview-container').style.display = 'none';
+            document.getElementById('race-form-container').style.display = 'block';
+        }
+
+        async function confirmAndSaveRace() {
+            if (!isAdmin || !currentPendingRace) return;
+
+            const h = currentPendingRace;
+
+            // 1. Aggiorna valori listino
+            state.riders.forEach(r => {
+                const change = h.priceChanges.find(c => c.name === r.name);
+                if (change) r.value = change.newVal;
+            });
+
+            // 2. Aggiorna punteggi utenti e salva formazione effettiva come "prevStarters / prevCaptain" per il fallback della gara successiva
+            state.users.forEach(u => {
+                const ur = h.userResults.find(x => x.userId === u.id);
+                if (ur) {
+                    u.score += ur.totalPoints;
+                    u.prevStarters = [...ur.starters];
+                    u.prevCaptain = ur.captain;
+                    u.racesPlayed = (u.racesPlayed || 0) + 1;
+                }
+                // Reset per la prossima gara
+                u.tradeDone = false;
+                u.starters = [];
+                u.captain = "";
+                u.tradeReplacements = {};
+            });
+
+            // 3. Registra nello storico
+            state.raceCount += 1;
+            const raceSummary = {
+                id: state.raceCount,
+                type: h.type,
+                name: h.name,
+                date: h.date,
+                top10: h.top10,
+                dnfs: h.dnfs,
+                userResults: h.userResults,
+                priceChanges: h.priceChanges
+            };
+
+            state.raceHistory.push(raceSummary);
+            state.nextDeadline = null; // Azzera la scadenza dopo la pubblicazione della gara
+
+            document.getElementById('race-name').value = '';
+            currentPendingRace = null;
+
+            await saveState();
+            updateDeadlineBanner();
+            alert("Gara Pubblicata e sincronizzata sul Cloud!");
+            switchTab('historico');
+        }
+
+        // ==========================================
+        // STORICO GARE (RETROCOMPATIBILE CON VECCHIO FORMATO P1/P2 E NUOVO MULTI-UTENTE)
+        // ==========================================
+        function renderHistory() {
+            const container = document.getElementById('history-container');
+            if (!state.raceHistory || state.raceHistory.length === 0) {
+                container.innerHTML = `<p style="color:var(--text-secondary); font-size:0.9rem;">Nessuna gara ancora registrata.</p>`;
+                return;
+            }
+
+            let html = '';
+            [...state.raceHistory].reverse().forEach(h => {
+                const formattedDate = h.date ? h.date.split('-').reverse().join('/') : 'N.D.';
+
+                let participantsHtml = '';
+                if (Array.isArray(h.userResults)) {
+                    participantsHtml = h.userResults.map(ur => `
+                        <p style="font-size:0.85rem; margin-bottom:2px;"><b>${ur.userName} (${ur.totalPoints >= 0 ? '+' : ''}${ur.totalPoints} pt totali):</b></p>
+                        <ul style="font-size:0.8rem; padding-left:18px; margin-bottom:8px;">
+                            ${(ur.details || []).map(d => `
+                                <li>
+                                    ${d.name} ${d.isCaptain ? '<b style="color:#ffd700;">[C x2]</b>' : ''} 
+                                    <b style="color:${d.points >= 0 ? 'var(--secondary)' : 'var(--error)'}">(${d.points >= 0 ? '+' : ''}${d.points} pt)</b>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    `).join('');
+                } else {
+                    // Retrocompatibilità con gare storiche a 2 giocatori (p1Points / p2Points)
+                    participantsHtml = `
+                        <p style="font-size:0.85rem; margin-bottom:2px;"><b>BOGI (+${h.p1Points || 0} pt totali):</b></p>
+                        <ul style="font-size:0.8rem; padding-left:18px; margin-bottom:8px;">
+                            ${(h.p1Details || []).map(d => `<li>${d.name} <b style="color:${d.points >= 0 ? 'var(--secondary)' : 'var(--error)'}">(${d.points >= 0 ? '+' : ''}${d.points} pt)</b></li>`).join('')}
+                        </ul>
+                        <p style="font-size:0.85rem; margin-bottom:2px;"><b>JACOPO (+${h.p2Points || 0} pt totali):</b></p>
+                        <ul style="font-size:0.8rem; padding-left:18px; margin-bottom:10px;">
+                            ${(h.p2Details || []).map(d => `<li>${d.name} <b style="color:${d.points >= 0 ? 'var(--secondary)' : 'var(--error)'}">(${d.points >= 0 ? '+' : ''}${d.points} pt)</b></li>`).join('')}
+                        </ul>
+                    `;
+                }
+
+                html += `
+                <div class="card" style="background:#262626; margin-bottom:15px; border-left:4px solid var(--primary);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #333; padding-bottom:6px; margin-bottom:8px;">
+                        <h3 style="color:var(--primary); font-size:1rem;">#${h.id} - ${h.name}</h3>
+                        <span style="font-size:0.75rem; color:var(--secondary); font-weight:bold;">${formattedDate}</span>
+                    </div>
+                    
+                    <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:8px;">Circuito: <b>${h.type}</b></p>
+
+                    <h4 style="font-size:0.8rem; color:var(--secondary); margin-top:8px; margin-bottom:4px;">Ordine d'Arrivo e DNF:</h4>
+                    <ol class="list-numbered" style="padding-left:22px; list-style-type:decimal; margin-bottom:6px;">
+                        ${(h.top10 || []).map(rName => `<li>${rName ? rName : '<i>-- non assegnato --</i>'}</li>`).join('')}
+                    </ol>
+                    ${(h.dnfs && h.dnfs.length > 0) ? `<p style="font-size:0.8rem; color:var(--error); margin-bottom:10px;"><b>DNF:</b> ${h.dnfs.join(', ')}</p>` : ''}
+
+                    <hr style="border-color:#333; margin:10px 0;">
+                    <h4 style="font-size:0.8rem; color:var(--secondary); margin-bottom:6px;">Punti Titolari Partecipanti:</h4>
+                    ${participantsHtml}
+
+                    <h4 style="font-size:0.8rem; color:var(--secondary); margin-top:8px; margin-bottom:4px;">Variazioni Listino (Δ Cr):</h4>
+                    ${(!h.priceChanges || h.priceChanges.length === 0) ? '<p style="font-size:0.75rem; color:#888;">Nessuna variazione</p>' : ''}
+                    <ul style="font-size:0.8rem; padding-left:18px;">
+                        ${(h.priceChanges || []).map(c => `<li>${c.name}: <span class="${c.delta > 0 ? 'val-plus' : 'val-minus'}">${c.delta > 0 ? '+' : ''}${c.delta} Cr</span> (ora ${c.newVal} Cr)</li>`).join('')}
+                    </ul>
+                </div>`;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // ==========================================
+        // DETTAGLIO CORRIDORE (TOP 10 & DNF)
+        // ==========================================
+        function openRiderDetail(riderName) {
+            const modal = document.getElementById('rider-detail-modal');
+            const titleEl = document.getElementById('rider-detail-title');
+            const summaryEl = document.getElementById('rider-detail-summary');
+            const historyEl = document.getElementById('rider-detail-history');
+
+            titleEl.innerText = riderName;
+
+            const riderObj = state.riders.find(r => r.name === riderName);
+            const currentVal = riderObj ? riderObj.value : '-';
+
+            let totalFcxPts = 0;
+            let totalRankingRacePts = 0;
+            const initRankingPts = rankingInitialPoints[riderName] || 0;
+            const raceRows = [];
+
+            if (state.raceHistory && state.raceHistory.length > 0) {
+                [...state.raceHistory].reverse().forEach(h => {
+                    const top10 = h.top10 || [];
+                    const dnfs = h.dnfs || [];
+                    const posIndex = top10.indexOf(riderName);
+                    const isDnf = dnfs.includes(riderName);
+
+                    const fcxPts = calculateRiderPoints(riderName, h.type, top10, dnfs);
+                    const rankPts = (posIndex !== -1 && posIndex < 10) ? rankingRacePoints[posIndex] : 0;
+
+                    totalFcxPts += fcxPts;
+                    totalRankingRacePts += rankPts;
+
+                    if (posIndex === -1 && !isDnf) return;
+
+                    let resultLabel = '';
+                    if (posIndex !== -1) {
+                        resultLabel = `<b style="color:var(--primary);">${posIndex + 1}° posto</b>`;
+                    } else if (isDnf) {
+                        resultLabel = `<b style="color:var(--error);">Ritirato (DNF)</b>`;
+                    }
+
+                    const pChange = (h.priceChanges || []).find(c => c.name === riderName);
+                    const deltaStr = pChange 
+                        ? `<span class="${pChange.delta > 0 ? 'val-plus' : 'val-minus'}">${pChange.delta > 0 ? '+' : ''}${pChange.delta} Cr</span>` 
+                        : '<span style="color:#666;">0 Cr</span>';
+
+                    const formattedDate = h.date ? h.date.split('-').reverse().join('/') : 'N.D.';
+
+                    raceRows.push(`
+                        <div style="background:#202020; border:1px solid #333; border-radius:6px; padding:10px; margin-bottom:8px;">
+                            <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom:4px;">
+                                <b>#${h.id} ${h.name} <span style="color:var(--text-secondary); font-weight:normal;">(${h.type})</span></b>
+                                <span style="color:var(--text-secondary); font-size:0.75rem;">${formattedDate}</span>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; margin-top:6px;">
+                                <div>Esito: ${resultLabel}</div>
+                                <div>FCX: <b style="color:${fcxPts > 0 ? 'var(--secondary)' : (fcxPts < 0 ? 'var(--error)' : 'var(--text-secondary)')}">${fcxPts > 0 ? '+' : ''}${fcxPts} pt</b> | Δ: ${deltaStr}</div>
+                            </div>
+                        </div>
+                    `);
+                });
+            }
+
+            const totalRankingPts = initRankingPts + totalRankingRacePts;
+
+            summaryEl.innerHTML = `
+                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; background:#202020; padding:10px; border-radius:6px; border:1px solid #333; font-size:0.82rem;">
+                    <div>Valore: <b style="color:var(--primary);">${currentVal} Cr</b></div>
+                    <div>Punti FCX: <b style="color:${totalFcxPts >= 0 ? 'var(--secondary)' : 'var(--error)'};">${totalFcxPts} pt</b></div>
+                    <div>Ranking: <b style="color:var(--secondary);">${totalRankingPts} pt</b></div>
+                </div>
+            `;
+
+            if (raceRows.length === 0) {
+                historyEl.innerHTML = `<p style="color:var(--text-secondary); font-size:0.85rem;">Nessun piazzamento in Top 10 o ritiro registrato nello storico.</p>`;
+            } else {
+                historyEl.innerHTML = raceRows.join('');
+            }
+
+            modal.style.display = 'block';
+        }
+
+        function closeRiderDetail() {
+            document.getElementById('rider-detail-modal').style.display = 'none';
+        }
+
+        window.onload = initApp;
+    </script>
+</body>
+</html>
