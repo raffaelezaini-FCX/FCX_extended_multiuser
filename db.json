@@ -206,8 +206,14 @@
         "hendrikx m.",
         "kuhn k."
       ],
-      "starters": [],
-      "captain": "",
+      "starters": [
+        "bommenel n.",
+        "ceolin f.",
+        "del grosso t.",
+        "hendrikx m.",
+        "kuhn k."
+      ],
+      "captain": "del grosso t.",
       "prevStarters": [],
       "prevCaptain": "",
       "tradeDone": false,
