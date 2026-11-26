@@ -236,8 +236,14 @@
         "debord r.",
         "mason c."
       ],
-      "starters": [],
-      "captain": "",
+      "starters": [
+        "van de putte v.",
+        "iserbyt e.",
+        "kamp r.",
+        "ceolin f.",
+        "ruegg t."
+      ],
+      "captain": "ruegg t.",
       "prevStarters": [],
       "prevCaptain": "",
       "tradeDone": false,
