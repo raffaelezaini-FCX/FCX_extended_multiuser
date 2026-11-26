@@ -219,6 +219,22 @@
       "tradeDone": false,
       "racesPlayed": 0,
       "tradeReplacements": {}
+    },
+    {
+      "id": "u_1795716315347",
+      "name": "TEST2",
+      "password": "test2",
+      "score": 0,
+      "budget": 170,
+      "initialBudget": 170,
+      "roster": [],
+      "starters": [],
+      "captain": "",
+      "prevStarters": [],
+      "prevCaptain": "",
+      "tradeDone": false,
+      "racesPlayed": 0,
+      "tradeReplacements": {}
     }
   ],
   "nextDeadline": null,
