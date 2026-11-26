@@ -189,7 +189,24 @@
       "value": 17
     }
   ],
-  "users": [],
+  "users": [
+    {
+      "id": "u_1795716191117",
+      "name": "TEST1",
+      "password": "test1",
+      "score": 0,
+      "budget": 170,
+      "initialBudget": 170,
+      "roster": [],
+      "starters": [],
+      "captain": "",
+      "prevStarters": [],
+      "prevCaptain": "",
+      "tradeDone": false,
+      "racesPlayed": 0,
+      "tradeReplacements": {}
+    }
+  ],
   "nextDeadline": null,
   "raceCount": 0,
   "raceHistory": []
